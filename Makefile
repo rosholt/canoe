@@ -1,6 +1,6 @@
 PROJECT_NAME=canoe
 
-VPATH = src:build:src/ast
+VPATH = src:build:src/ast:generated
 
 .PRECIOUS: build generated generated/%.cc build/%.o generated/%.h bin/%
 
@@ -15,6 +15,8 @@ CLANG = clang++
 CFLAGS = -Wno-write-strings -std=c++11 -x c++ -Iinclude -I/usr/local/opt/llvm/include -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-register
 LLVM_FLAGS = $(shell llvm-config --cxxflags --ldflags --system-libs --libs core) -ll
 
+
+# Build executable
 bin/$(PROJECT_NAME): $(OBJECT_FILES)
 	mkdir -p $(dir $@)
 	$(CLANG) $^ $(LLVM_FLAGS) -o $@
@@ -23,11 +25,7 @@ build/%.o: generated/%.cc
 	mkdir -p $(dir $@)
 	$(CLANG) $(CFLAGS) -c $< -o $@
 
-build/%.o: src/%.cc
-	mkdir -p $(dir $@)
-	$(CLANG) $(CFLAGS) -c $< -o $@
-
-build/%.o: src/ast/%.cc
+build/%.o: %.cc
 	mkdir -p $(dir $@)
 	$(CLANG) $(CFLAGS) -c $< -o $@
 
