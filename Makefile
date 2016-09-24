@@ -21,11 +21,11 @@ bin/$(PROJECT_NAME): $(OBJECT_FILES)
 	mkdir -p $(dir $@)
 	$(CLANG) $^ $(LLVM_FLAGS) -o $@
 
-build/%.o: generated/%.cc
+build/%.o: %.cc
 	mkdir -p $(dir $@)
 	$(CLANG) $(CFLAGS) -c $< -o $@
 
-build/%.o: %.cc
+build/%.o: generated/%.cc
 	mkdir -p $(dir $@)
 	$(CLANG) $(CFLAGS) -c $< -o $@
 
