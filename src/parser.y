@@ -29,17 +29,21 @@ int main() {
 %token	<int_val>	INTEGER_LITERAL
 %token	<string_val>	FIELD_NAME
 %type	<node_ptr>	exp
+%type	<node_ptr>	single_exp
 %type	<func_ptr>	func
 %left	PLUS
 %left	MULT
 %left	DEF
 %left	END
+%left TERMINATOR
 
 %%
 
 input:		func { $1->BuildIR()->dump(); };
 
-func: DEF FIELD_NAME exp END { $$ = new FunctionNode($2, $3); }
+func: DEF FIELD_NAME TERMINATOR single_exp END TERMINATOR { $$ = new FunctionNode($2, $4); }
+
+single_exp: exp TERMINATOR { $$ = $1; }
 
 exp:		INTEGER_LITERAL	{ $$ = new ConstantNode($1); }
 		| exp PLUS exp	{ $$ = new AddNode($1, $3); }

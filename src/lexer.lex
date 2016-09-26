@@ -5,21 +5,37 @@
 int yyerror(char *s);
 %}
 
+/* Primitives */
 digit            [0-9]
 lowercase        [a-z]
 uppercase        [A-Z]
 symbol           [!@#$%^&()_\-=\[\]|\\<>?/]
-valid_field_start_char       ({lowercase}|{symbol})
-valid_char       ({valid_field_start_char}|{uppercase})
+whitespace       [ \t]+
+terminator       [;\n]
+
+/* Keywords */
+def              "def"
+end              "end"
+
+/* Constants */
+integer          {digit}+
+
+/* Field names */
+field_start      {lowercase}|{symbol}
+field_char       {field_start}|{uppercase}|{digit}
+field_name       {field_start}{field_char}*
 
 %%
-"def"           return DEF;
-"end"           return END;
-{valid_field_start_char}{valid_char}* { yylval.string_val = new string(yytext); return FIELD_NAME; }
-{digit}+		{ yylval.int_val = atoi(yytext); return INTEGER_LITERAL; }
-"+"		return PLUS;
-"*"		return MULT;
+{def}             return DEF;
+{end}             return END;
+{terminator}      return TERMINATOR;
 
-[ \t\n]*	{}
+"+"               return PLUS;
+"*"               return MULT;
 
-.		{ std::cerr << "SCANNER "; yyerror(""); exit(1);	}
+{field_name}      { yylval.string_val = new string(yytext); return FIELD_NAME; }
+{integer}         { yylval.int_val = atoi(yytext); return INTEGER_LITERAL; }
+
+{whitespace}      {}
+
+.                 { std::cerr << "SCANNER "; yyerror(""); exit(1);	}

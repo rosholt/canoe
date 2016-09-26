@@ -1,3 +1,6 @@
+#TODO: Include cppcheck and clang static analyzer
+
+
 PROJECT_NAME=canoe
 
 VPATH = src:build:src/ast:generated
