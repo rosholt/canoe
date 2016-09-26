@@ -11,7 +11,7 @@ lowercase        [a-z]
 uppercase        [A-Z]
 symbol           [!@#$%^&()_\-=\[\]|\\<>?/]
 whitespace       [ \t]+
-terminator       [;\n]
+terminator       [;\n][ \t\n]*
 
 /* Keywords */
 def              "def"
@@ -33,7 +33,7 @@ field_name       {field_start}{field_char}*
 "+"               return PLUS;
 "*"               return MULT;
 
-{field_name}      { yylval.string_val = new string(yytext); return FIELD_NAME; }
+{field_name}      { yylval.string_ptr = new string(yytext); return FIELD_NAME; }
 {integer}         { yylval.int_val = atoi(yytext); return INTEGER_LITERAL; }
 
 {whitespace}      {}
