@@ -15,15 +15,22 @@ FunctionNode::FunctionNode(FunctionSignature *signature, Node *body) : signature
 Function *FunctionNode::BuildIR(BuilderAdaptor *adaptor, Scope *scope) {
   auto TheModule = new Module("juggernaut", *adaptor->Context());
   auto integer_type = adaptor->Builder()->getInt32Ty();
-  vector<Type*> params(1, integer_type);
-  FunctionType *function_type = FunctionType::get(integer_type, params, false);
+  
+  FunctionType *function_type;
+  if (signature_->parameter_count > 0) {
+    vector<Type*> params(1, integer_type);
+    function_type = FunctionType::get(integer_type, params, false);
+  } else {
+    function_type = FunctionType::get(integer_type, false);
+  }
   
   Function *function = Function::Create(function_type, Function::ExternalLinkage, *signature_->name, TheModule);
   
+  int parameter_index = 0;
   for (auto &arg : function->args()) {
-    auto parameter_name = signature_->parameter_array[0];
+    auto parameter_name = signature_->parameter_array[parameter_index++];
     arg.setName(parameter_name);
-    scope->named_values["a"] = &arg;
+    scope->named_values[parameter_name] = &arg;
   }
   
   BasicBlock *block = BasicBlock::Create(*adaptor->Context(), "entry", function);

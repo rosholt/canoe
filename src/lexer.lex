@@ -7,11 +7,11 @@ int yyerror(char *s);
 
 /* Primitives */
 left_parenthesis     "("
-right_parenthesis    "("
+right_parenthesis    ")"
 digit                [0-9]
 lowercase            [a-z]
 uppercase            [A-Z]
-symbol               [!@#$%^&()_\-=\[\]|\\<>?/]
+symbol               [!@#$%^&_\-=\[\]|\\<>?/]
 whitespace           [ \t]+
 terminator           [;\n][ \t\n]*
 

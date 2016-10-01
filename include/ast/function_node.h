@@ -7,7 +7,8 @@ using namespace std;
 using namespace llvm;
 
 struct FunctionSignature {
-  string *name;
+  string *name = NULL;
+  int parameter_count = 0;
   string *parameter_array = NULL;
 };
 

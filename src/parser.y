@@ -15,10 +15,11 @@ int main() {
 %}
 
 %union {
-  int            int_val;
-  string*        string_ptr;
-  Node*          node_ptr;
-  FunctionNode*  func_ptr;
+  int                 int_val;
+  string*             string_ptr;
+  Node*               node_ptr;
+  FunctionNode*       func_ptr;
+  FunctionSignature*  func_signature_ptr;
 }
 
 %token <int_val>    INTEGER_LITERAL
@@ -26,6 +27,7 @@ int main() {
 
 %type <node_ptr> exp
 %type <func_ptr> function
+%type <func_signature_ptr> function_signature
 
 %left LEFT_PARENTHESIS
 %left RIGHT_PARENTHESIS
@@ -42,14 +44,16 @@ input: input input {}
        | function TERMINATOR { $1->BuildIR()->dump(); }
        | function { $1->BuildIR()->dump(); }
 
-function: DEF FIELD_NAME TERMINATOR exp TERMINATOR END {
-    FunctionSignature *signature = new FunctionSignature;
-    signature->name = $2;
-    signature->parameter_array = { new string("a") };
-    $$ = new FunctionNode(signature, $4);
-  }
-/*          | DEF FIELD_NAME LEFT_PARENTHESIS FIELD_NAME RIGHT_PARENTHESIS TERMINATOR exp TERMINATOR END { $$ = new FunctionNode($2, $3, $4); }
-*/
+function: function_signature TERMINATOR exp TERMINATOR END { $$ = new FunctionNode($1, $3); }
+
+function_signature: DEF FIELD_NAME { $$ = new FunctionSignature; $$->name = $2; }
+                    | DEF FIELD_NAME LEFT_PARENTHESIS FIELD_NAME RIGHT_PARENTHESIS {
+                        $$ = new FunctionSignature;
+                        $$->name = $2;
+                        $$->parameter_count = 1;
+                        $$->parameter_array = { $4 };
+                      }
+
 exp: INTEGER_LITERAL { $$ = new ConstantNode($1); }
      | exp PLUS exp  { $$ = new AddNode($1, $3); }
      | exp MULT exp  { $$ = new MultiplyNode($1, $3); }
