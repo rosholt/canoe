@@ -10,7 +10,7 @@
 using namespace std;
 using namespace llvm;
 
-FunctionNode::FunctionNode(string *name, Node *body) : name_(name), body_(body) {};
+FunctionNode::FunctionNode(FunctionSignature *signature, Node *body) : signature_(signature), body_(body) {};
 
 Function *FunctionNode::BuildIR(BuilderAdaptor *adaptor, Scope *scope) {
   auto TheModule = new Module("juggernaut", *adaptor->Context());
@@ -18,10 +18,11 @@ Function *FunctionNode::BuildIR(BuilderAdaptor *adaptor, Scope *scope) {
   vector<Type*> params(1, integer_type);
   FunctionType *function_type = FunctionType::get(integer_type, params, false);
   
-  Function *function = Function::Create(function_type, Function::ExternalLinkage, *name_, TheModule);
+  Function *function = Function::Create(function_type, Function::ExternalLinkage, *signature_->name, TheModule);
   
   for (auto &arg : function->args()) {
-    arg.setName("a");
+    auto parameter_name = signature_->parameter_array[0];
+    arg.setName(parameter_name);
     scope->named_values["a"] = &arg;
   }
   

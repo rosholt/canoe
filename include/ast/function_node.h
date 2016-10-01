@@ -6,12 +6,17 @@
 using namespace std;
 using namespace llvm;
 
+struct FunctionSignature {
+  string *name;
+  string *parameter_array = NULL;
+};
+
 class FunctionNode {
-  const string *name_;
+  const FunctionSignature *signature_;
   Node *body_;
 
 public:
-  FunctionNode(string *name, Node *body);
+  FunctionNode(FunctionSignature *signature, Node *body);
   Function *BuildIR(BuilderAdaptor *adaptor = BuilderAdaptor::instance(), Scope *scope = new Scope);
 };
 
