@@ -1,17 +1,19 @@
 %{
 #include "heading.h"
-#include "ast/add_node.h"
-#include "ast/multiply_node.h"
-#include "ast/constant_node.h"
-#include "ast/function_node.h"
 
 int yyerror(char *s);
 int yylex(void);
 int yyparse();
 
-
+Scope *scope;
+BuilderAdaptor *builder;
+ModuleNode *module_node;
 
 int main() {
+  scope = new Scope;
+  builder = BuilderAdaptor::instance();
+  std::string name = "anonymous";
+  module_node = new ModuleNode(name);
   return yyparse();
 }
 %}
@@ -22,7 +24,8 @@ int main() {
   Node*               node_ptr;
   FunctionNode*       func_ptr;
   FunctionSignature*  func_signature_ptr;
-  vector<Node *>      node_ptr_vector;
+  SizedNodeArray*          sized_array_ptr;
+  ModuleNode*         module_node_ptr;
 }
 
 %token <int_val>    INTEGER_LITERAL
@@ -31,8 +34,9 @@ int main() {
 %type <node_ptr> expression
 %type <func_ptr> function
 %type <func_signature_ptr> function_signature
-%type <node_ptr_vector> function_arguments 
+%type <sized_array_ptr> function_arguments 
 %type <node_ptr> function_call 
+%type <module_node_ptr> expressions 
 
 %left LEFT_PARENTHESIS
 %left RIGHT_PARENTHESIS
@@ -45,30 +49,31 @@ int main() {
 
 %%
 
-expressions: expressions expression { $2->BuildIR()->dump(); }
-             | expression { $1->BuildIR()->dump(); }
+input: expressions { module_node->BuildIR(std::unique_ptr<Scope>(scope), std::unique_ptr<BuilderAdaptor>(builder))->dump(); }
+
+expressions: expressions expression { module_node->append($2); std::cout << "2 " << module_node << endl; }
+             | expression { module_node->append($1); std::cout << "1 " << module_node << endl; }
 
 expression: function
             | INTEGER_LITERAL { $$ = new ConstantNode($1); }
-            | expression PLUS expression  { $$ = new AddNode($1, $3); }
-            | expression MULT expression  { $$ = new MultiplyNode($1, $3); }
-            | FIELD_NAME    { $$ = new ValueNode($1); }
+            | expression PLUS expression  { $$ = new AddNode(std::unique_ptr<Node>($1), std::unique_ptr<Node>($3)); }
+            | expression MULT expression  { $$ = new MultiplyNode(std::unique_ptr<Node>($1), std::unique_ptr<Node>($3)); }
+            | FIELD_NAME    { $$ = new ValueNode(*$1); }
             | function_call
 
-function: function_signature TERMINATOR expression TERMINATOR END { $$ = new FunctionNode($1, $3); }
+function: function_signature TERMINATOR expression TERMINATOR END { $$ = new FunctionNode(std::unique_ptr<FunctionSignature>($1), std::unique_ptr<Node>($3)); }
 
-function_signature: DEF FIELD_NAME { $$ = new FunctionSignature; $$->name = $2; }
+function_signature: DEF FIELD_NAME { $$ = new FunctionSignature; $$->name = *$2; }
                     | DEF FIELD_NAME LEFT_PARENTHESIS FIELD_NAME RIGHT_PARENTHESIS {
                         $$ = new FunctionSignature;
-                        $$->name = $2;
-                        $$->parameter_count = 1;
-                        $$->parameter_array = { $4 };
+                        $$->name = *$2;
+                        $$->parameters = vector<std::string> { *$4 };
                       }
 
-function_call: FIELD_NAME LEFT_PARENTHESIS function_arguments RIGHT_PARENTHESIS { $$ = new CallNode($1, $3); }
+function_call: FIELD_NAME LEFT_PARENTHESIS function_arguments RIGHT_PARENTHESIS { std::vector<Node *> v(std::begin($3->array), std::end($3->array)); $$ = new CallNode(*$1, v); }
 
-function_arguments: expression function_arguments { $2.push_back($1); $$ = $2; }
-                    | expression { $$ = new vector<Node *> {$1}; } 
+function_arguments: expression function_arguments { $2->push($1); $$ = $2; }
+                    | expression { $$ = new SizedArray<Node *>; $$->push($1); } 
 
 
 %%

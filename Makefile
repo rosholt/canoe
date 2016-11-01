@@ -15,7 +15,7 @@ SOURCE_FILES = $(foreach dir, $(SOURCE_FILE_DIRECTORIES), $(wildcard $(dir)/*.cc
 OBJECT_FILES = $(PARSER_OBJECT_FILE) $(LEXER_OBJECT_FILE) $(SOURCE_FILES:src/%.cc=build/%.o)
 
 CLANG = clang++
-CFLAGS = -Wno-write-strings -std=c++11 -x c++ -Iinclude -I/usr/local/opt/llvm/include -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-register
+CFLAGS = -Wno-write-strings -std=c++14 -x c++ -Iinclude -I/usr/local/opt/llvm/include -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -Wno-deprecated-register -Wall
 LLVM_FLAGS = $(shell llvm-config --cxxflags --ldflags --system-libs --libs core) -ll
 
 

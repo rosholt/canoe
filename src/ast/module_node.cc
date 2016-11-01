@@ -1,19 +1,25 @@
 #include <memory>
 
 #include "ast/module_node.h"
+#include "builder_adaptor.h"
+#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Module.h"
+#include "ast/node.h"
+#include "scope.h"
 
-ModuleNode::ModuleNode(const std::string name) : name_(name), nodes_(std::vector<Node *>()) {}
+ModuleNode::ModuleNode(const std::string name) :
+    name_(name), nodes_(std::vector<Node *>()) {
+}
 
-Value *ModuleNode::BuildIR(BuilderAdaptor *adaptor, Scope *scope) {
-  auto module = new llvm::Module(name_, *adaptor->Context());
+void ModuleNode::append(Node *node) {
+  nodes_.push_back(node);
+}
 
-  // TODO: Should be an auto
+std::unique_ptr<llvm::Module> ModuleNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  auto module_scope = std::make_unique<Scope>();
+  module_scope->module = std::make_unique<llvm::Module>(name_, *adaptor->Context());
 
-  auto module_scope = new Scope;
-  module_scope->module = scope->module;
+  std::for_each(nodes_.begin(), nodes_.end(), [&](auto n) {n->BuildIR(module_scope, adaptor);});
 
-  std::for_each(nodes_.begin(), nodes_.end(), [&](Node *n) {n->BuildIR(adaptor, module_scope);});
-
-  return module;
+  return std::move(module_scope->module);
 };

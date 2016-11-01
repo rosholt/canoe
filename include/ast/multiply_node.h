@@ -2,18 +2,15 @@
 #define CANOE_AST_MULTIPLY_NODE_H_
 
 #include "ast/node.h"
-#include "builder_adaptor.h"
-
-using namespace llvm;
 
 class MultiplyNode : public Node {
 private:
-  Node *left_;
-  Node *right_;
+  const std::unique_ptr<Node> left_;
+  const std::unique_ptr<Node> right_;
 
 public:
-  MultiplyNode(Node *left, Node *right);
-  Value *BuildIR(BuilderAdaptor *adaptor = BuilderAdaptor::instance(), Scope *scope = new Scope);
+  MultiplyNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right);
+  std::unique_ptr<llvm::Value> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const override;
 };
 
 #endif

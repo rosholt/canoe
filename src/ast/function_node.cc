@@ -1,41 +1,52 @@
+#include <algorithm>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <sstream>
+
 #include "ast/function_node.h"
+#include "ast/node.h"
 #include "builder_adaptor.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
-#include "llvm/IR/Type.h"
-#include "llvm/IR/Function.h"
+#include "llvm/IR/Argument.h"
 #include "llvm/IR/DerivedTypes.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
+#include "scope.h"
 
-FunctionNode::FunctionNode(const std::unique_ptr<FunctionSignature> signature, const std::unique_ptr<Node> *body) :
-    signature_(signature), body_(body) {
+FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Node> body) :
+    signature_(std::move(signature)), body_(std::move(body)) {
 }
 
-std::unique_ptr<Value> FunctionNode::BuildIR(const std::unique_ptr<Scope> scope, const BuilderAdaptor *adaptor) const {
+std::unique_ptr<llvm::Function> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  std::stringstream buffer;
+  buffer << "[Function " << signature_->name << "] Generating IR" << std::endl;
+  buffer.flush();
+
   auto integer_type = adaptor->Builder()->getInt32Ty();
 
-  FunctionType *function_type;
-  if (signature_->parameter_count > 0) {
-    vector<Type*> params(1, integer_type);
-    function_type = FunctionType::get(integer_type, params, false);
-  } else {
-    function_type = FunctionType::get(integer_type, false);
-  }
+  std::vector<llvm::Type *> params;
+  std::transform(signature_->parameters.begin(), signature_->parameters.end(), params.begin(), [&](auto p) {return integer_type;});
+  auto function_type = llvm::FunctionType::get(integer_type, params, false);
 
-  Function *function = Function::Create(function_type, Function::ExternalLinkage, *signature_->name, TheModule);
+  llvm::Function *function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, signature_->name, scope->module.get());
 
   int parameter_index = 0;
   for (auto &arg : function->args()) {
-    auto parameter_name = signature_->parameter_array[parameter_index++];
+    auto parameter_name = signature_->parameters[parameter_index++];
     arg.setName(parameter_name);
-    scope->named_values[parameter_name] = &arg;
+    scope->named_values[parameter_name] = std::unique_ptr<llvm::Argument>(&arg);
   }
 
-  BasicBlock *block = BasicBlock::Create(*adaptor->Context(), "entry", function);
+  llvm::BasicBlock *block = llvm::BasicBlock::Create(*adaptor->Context(), "entry", function);
   adaptor->Builder()->SetInsertPoint(block);
-  adaptor->Builder()->CreateRet(body_->BuildIR(adaptor, scope));
+  adaptor->Builder()->CreateRet(body_->BuildIR(scope, adaptor).get());
   verifyFunction(*function);
-  scope->named_functions[*signature_->name] = function;
+  scope->named_functions[signature_->name] = std::unique_ptr<llvm::Function>(function);
 
-  return function;
-};
+//  return function;
+  return nullptr;
+}

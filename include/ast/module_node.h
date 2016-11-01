@@ -1,16 +1,27 @@
 #ifndef CANOE_AST_MODULE_NODE_H_
 #define CANOE_AST_MODULE_NODE_H_
 
-class Value;
+#include <string>
+#include <vector>
 
-class ModuleNode : public Node {
+namespace llvm {
+class Module;
+}
+
+class BuilderAdaptor;
+struct Scope;
+class Node;
+
+class ModuleNode {
 private:
   const std::string name_;
-  const std::vector<Node *> nodes_;
+  std::vector<Node *> nodes_;
 
 public:
   ModuleNode(const std::string name);
-  Value *BuildIR(BuilderAdaptor *adaptor = BuilderAdaptor::instance(), Scope *scope = new Scope);
+
+  void append(Node *node);
+  std::unique_ptr<llvm::Module> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
 };
 
 #endif

@@ -1,13 +1,16 @@
+#include <memory>
+
 #include "ast/multiply_node.h"
+#include "builder_adaptor.h"
+#include "llvm/IR/IRBuilder.h"
 
-using namespace std;
-using namespace llvm;
+MultiplyNode::MultiplyNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+    left_(std::move(left)), right_(std::move(right)) {
+}
 
-MultiplyNode::MultiplyNode(Node *left, Node *right) : left_(left), right_(right) {}
+std::unique_ptr<llvm::Value> MultiplyNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  auto leftValue = left_->BuildIR(scope, adaptor);
+  auto rightValue = right_->BuildIR(scope, adaptor);
 
-Value *MultiplyNode::BuildIR(BuilderAdaptor *adaptor, Scope *scope) {
-  Value *leftValue = left_->BuildIR(adaptor, scope);
-  Value *rightValue = right_->BuildIR(adaptor, scope);
-
-  return adaptor->Builder()->CreateMul(leftValue, rightValue, "multmp");
+  return std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateMul(leftValue.get(), rightValue.get(), "multmp"));
 }
