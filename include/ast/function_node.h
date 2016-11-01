@@ -1,24 +1,20 @@
-#ifndef JUGGERNAUT_AST_FUNCTION_NODE_H_
-#define JUGGERNAUT_AST_FUNCTION_NODE_H_
+#ifndef CANOE_AST_FUNCTION_NODE_H_
+#define CANOE_AST_FUNCTION_NODE_H_
 
 #include "ast/node.h"
 
-using namespace std;
-using namespace llvm;
-
 struct FunctionSignature {
-  string *name = NULL;
-  int parameter_count = 0;
-  string *parameter_array = NULL;
+  const std::string name;
+  const std::vector<std::string> parameters;
 };
 
 class FunctionNode {
-  const FunctionSignature *signature_;
-  Node *body_;
+  const std::unique_ptr<FunctionSignature> signature_;
+  const std::unique_ptr<Node> body_;
 
 public:
-  FunctionNode(FunctionSignature *signature, Node *body);
-  Function *BuildIR(BuilderAdaptor *adaptor = BuilderAdaptor::instance(), Scope *scope = new Scope);
+  FunctionNode(const std::unique_ptr<FunctionSignature> signature, const std::unique_ptr<Node> *body);
+  std::unique_ptr<Value> BuildIR(const std::unique_ptr<Scope> scope, const BuilderAdaptor *adaptor = BuilderAdaptor::instance()) const override;
 };
 
 #endif

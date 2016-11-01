@@ -1,5 +1,5 @@
-#ifndef JUGGERNAUT_AST_MULTIPLY_NODE_H_
-#define JUGGERNAUT_AST_MULTIPLY_NODE_H_
+#ifndef CANOE_AST_MULTIPLY_NODE_H_
+#define CANOE_AST_MULTIPLY_NODE_H_
 
 #include "ast/node.h"
 #include "builder_adaptor.h"

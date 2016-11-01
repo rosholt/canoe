@@ -1,15 +1,16 @@
-#ifndef JUGGERNAUT_AST_NODE_H_
-#define JUGGERNAUT_AST_NODE_H_
+#ifndef CANOE_AST_NODE_H_
+#define CANOE_AST_NODE_H_
 
-#include "llvm/IR/value.h"
-#include "builder_adaptor.h"
-#include "scope.h"
+class llvm::Value;
+class BuilderAdaptor;
+class Scope;
 
 using namespace llvm;
 
 class Node {
 public:
-  virtual Value *BuildIR(BuilderAdaptor *adaptor = BuilderAdaptor::instance(), Scope *scope = new Scope) = 0;
+  virtual std::unique_ptr<Value> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor =
+      BuilderAdaptor::instance()) const = 0;
   virtual ~Node() {}
 };
 

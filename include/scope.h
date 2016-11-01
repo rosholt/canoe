@@ -1,10 +1,12 @@
-#ifndef JUGGERNAUT_SCOPE_H_
-#define JUGGERNAUT_SCOPE_H_
+#ifndef CANOE_SCOPE_H_
+#define CANOE_SCOPE_H_
 
-#include <map>
+class Module;
 
 struct Scope {
+  Module module;
   std::map<std::string, Value *> named_values;
+  std::map<std::string, Function *> named_functions;
 };
 
 #endif

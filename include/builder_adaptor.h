@@ -1,24 +1,22 @@
-#ifndef JUGGERNAUT_BUILDER_ADAPTOR_H_
-#define JUGGERNAUT_BUILDER_ADAPTOR_H_
+#ifndef CANOE_BUILDER_ADAPTOR_H_
+#define CANOE_BUILDER_ADAPTOR_H_
 
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/LLVMContext.h"
-
-using namespace llvm;
+class llvm::IRBuilder;
+class llvm::LLVMContext;
 
 class BuilderAdaptor {
 private:
   static BuilderAdaptor *instance_;
-  IRBuilder<> *builder_;
-  LLVMContext *context_;
-  
+  llvm::IRBuilder<> *builder_;
+  llvm::LLVMContext *context_;
+
   BuilderAdaptor();
-  BuilderAdaptor(IRBuilder<> *builder, LLVMContext *context);
+  BuilderAdaptor(llvm::IRBuilder<> *builder, llvm::LLVMContext *context);
 public:
   static BuilderAdaptor *instance();
-  
-  IRBuilder<> *Builder();
-  LLVMContext *Context();
+
+  llvm::IRBuilder<> *Builder();
+  llvm::LLVMContext *Context();
 };
 
 #endif
