@@ -10,6 +10,7 @@ class Function;
 
 class Node;
 class BuilderAdaptor;
+class Expression;
 struct Scope;
 
 struct FunctionSignature {
@@ -20,10 +21,10 @@ struct FunctionSignature {
 class FunctionNode {
 private:
   const std::unique_ptr<FunctionSignature> signature_;
-  const std::unique_ptr<Node> body_;
+  const std::unique_ptr<Expression> body_;
 
 public:
-  FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Node> body);
+  FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body);
   std::unique_ptr<llvm::Function> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
 };
 

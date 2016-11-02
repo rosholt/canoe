@@ -1,12 +1,11 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
-#include <string>
-#include <sstream>
 
 #include "ast/function_node.h"
 #include "ast/node.h"
 #include "builder_adaptor.h"
+#import "expression.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/IR/Argument.h"
@@ -17,14 +16,14 @@
 #include "llvm/IR/Verifier.h"
 #include "scope.h"
 
-FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Node> body) :
+// TODO: THis should be an array of nodes for a "body_expressions"
+FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body) :
     signature_(std::move(signature)), body_(std::move(body)) {
 }
 
 std::unique_ptr<llvm::Function> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
-  std::stringstream buffer;
-  buffer << "[Function " << signature_->name << "] Generating IR" << std::endl;
-  buffer.flush();
+  std::cout << "[Function " << signature_->name << "] Generating IR" << std::endl;
+  fflush(stdout);
 
   auto integer_type = adaptor->Builder()->getInt32Ty();
 

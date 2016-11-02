@@ -1,9 +1,10 @@
 #include "ast/add_node.h"
 #include "builder_adaptor.h"
+#include "expression.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
 
-AddNode::AddNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+AddNode::AddNode(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right) :
     left_(std::move(left)), right_(std::move(right)) {
 }
 

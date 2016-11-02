@@ -2,9 +2,10 @@
 
 #include "ast/multiply_node.h"
 #include "builder_adaptor.h"
+#include "expression.h"
 #include "llvm/IR/IRBuilder.h"
 
-MultiplyNode::MultiplyNode(std::unique_ptr<Node> left, std::unique_ptr<Node> right) :
+MultiplyNode::MultiplyNode(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right) :
     left_(std::move(left)), right_(std::move(right)) {
 }
 

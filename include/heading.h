@@ -21,6 +21,7 @@
 
 #include "scope.h"
 #include "builder_adaptor.h"
+#include "expression.h"
 
 using namespace std;
 
@@ -35,6 +36,6 @@ public:
   }
 };
 
-typedef SizedArray<Node*> SizedNodeArray;
+typedef SizedArray<Expression*> SizedNodeArray;
 
 #endif
