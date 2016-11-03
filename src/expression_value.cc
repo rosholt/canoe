@@ -23,10 +23,13 @@ void ExpressionValue::dump() {
   switch (expression_value_type_) {
   case ExpressionValueType::FunctionValue:
     expression_value_result_.function->dump();
+    break;
   case ExpressionValueType::ValueValue:
     expression_value_result_.value->dump();
+    break;
   case ExpressionValueType::ModuleValue:
     expression_value_result_.module->dump();
+    break;
   }
 }
 

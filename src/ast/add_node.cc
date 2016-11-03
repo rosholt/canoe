@@ -9,14 +9,18 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
 
+#include <iostream>
+
 AddNode::AddNode(std::unique_ptr<Expression> left, std::unique_ptr<Expression> right) :
     left_(std::move(left)), right_(std::move(right)) {
 }
 
 std::unique_ptr<ExpressionValue> AddNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  std::cout << "[Add] Generating IR" << std::endl;
   auto leftValue = left_->BuildIR(scope, adaptor)->value();
   auto rightValue = right_->BuildIR(scope, adaptor)->value();
 
   auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateAdd(leftValue.get(), rightValue.get(), "addtmp"));
+  std::cout << "[Add] IR Generation Complete" << std::endl;
   return std::make_unique<ExpressionValue>(std::move(value));
 };

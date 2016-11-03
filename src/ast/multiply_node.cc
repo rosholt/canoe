@@ -1,4 +1,5 @@
 #include <memory>
+#include <iostream>
 
 #include "ast/multiply_node.h"
 #include "builder_adaptor.h"
@@ -16,9 +17,11 @@ MultiplyNode::MultiplyNode(std::unique_ptr<Expression> left, std::unique_ptr<Exp
 }
 
 std::unique_ptr<ExpressionValue> MultiplyNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  std::cout << "[Multiply] Generating IR" << std::endl;
   auto leftValue = left_->BuildIR(scope, adaptor)->value();
   auto rightValue = right_->BuildIR(scope, adaptor)->value();
 
-  auto value = std::make_unique<ExpressionValue>(std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateMul(leftValue.get(), rightValue.get(), "multmp")));
-  return std::unique_ptr<ExpressionValue>(std::move(value));
+  auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateMul(leftValue.get(), rightValue.get(), "multmp"));
+  std::cout << "[Multiply] IR Generation Complete" << std::endl;
+  return std::make_unique<ExpressionValue>(std::move(value));
 }

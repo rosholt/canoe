@@ -26,30 +26,21 @@ Expression::Expression(std::unique_ptr<ModuleNode> module_node) {
   expression_node.module_node = std::move(module_node);
 }
 
-//Expression::~Expression() {
-//  switch (expression_type) {
-//    case ExpressionType::ValueExpression:
-//    expression_node.value_node.reset();
-//    case ExpressionType::FunctionExpression:
-//    expression_node.function_node.node.reset();
-//    case ExpressionType::ModuleExpression:
-//    expression_node.module_node.reset();
-//  }
-//}
-
 std::unique_ptr<ExpressionValue> Expression::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+  std::unique_ptr<ExpressionValue> val;
   switch (expression_type) {
   case ExpressionType::ValueExpression:
     std::cout << "Expression resolves to value" << std::endl;
-    return expression_node.value_node->BuildIR(scope, adaptor);
+    val = expression_node.value_node->BuildIR(scope, adaptor);
+    std::cout << "Received result" << std::endl;
+    fflush(stdout);
+    val->dump();
+    return val;
   case ExpressionType::FunctionExpression:
     std::cout << "Expression resolves to function" << std::endl;
     return expression_node.function_node->BuildIR(scope, adaptor);
   case ExpressionType::ModuleExpression:
     std::cout << "Expression resolves to module" << std::endl;
     return expression_node.module_node->BuildIR(scope, adaptor);
-  default:
-    std::cout << "Expression resolution failed" << std::endl;
-    return nullptr;
   }
 }

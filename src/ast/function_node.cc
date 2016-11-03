@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <typeinfo>
 
 #include "ast/function_node.h"
 #include "ast/node.h"
@@ -29,7 +30,7 @@ FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::un
 }
 
 std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
-  std::cout << "[Function " << signature_->name << "] Generating IR" << std::endl;
+  std::cout << "[Function " << scope->module->getModuleIdentifier() << "." << signature_->name << "] Generating IR" << std::endl;
   fflush(stdout);
 
   auto integer_type = adaptor->Builder()->getInt32Ty();
@@ -49,10 +50,22 @@ std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> co
 
   llvm::BasicBlock *block = llvm::BasicBlock::Create(*adaptor->Context(), "entry", function);
   adaptor->Builder()->SetInsertPoint(block);
-  adaptor->Builder()->CreateRet(body_->BuildIR(scope, adaptor).get()->value().get());
+  std::cout << 1 << std::endl;
+  fflush(stdout);
+  auto ret = body_->BuildIR(scope, adaptor);
+  std::cout << 2 << std::endl;
+  fflush(stdout);
+  adaptor->Builder()->CreateRet(ret.get()->value().get());
+  std::cout << 3 << std::endl;
+  fflush(stdout);
+  std::cout << "[Function " << signature_->name << "] Verifying" << std::endl;
+  fflush(stdout);
   verifyFunction(*function);
+  std::cout << "[Function " << signature_->name << "] Verification Complete" << std::endl;
+  fflush(stdout);
   scope->named_functions[signature_->name] = std::unique_ptr<llvm::Function>(function);
 
+  std::cout << "[Function " << signature_->name << "] IR Generation Complete" << std::endl;
   return std::make_unique<ExpressionValue>(std::unique_ptr<llvm::Function>(function));
 //  return nullptr;
 }

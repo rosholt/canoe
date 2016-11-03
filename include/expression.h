@@ -30,8 +30,6 @@ public:
   Expression(std::unique_ptr<Node> value_node);
   Expression(std::unique_ptr<ModuleNode> module_node);
 
-//  ~Expression();
-
   std::unique_ptr<ExpressionValue> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
 };
 
