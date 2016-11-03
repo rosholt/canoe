@@ -5,7 +5,7 @@
 #include "ast/function_node.h"
 #include "ast/node.h"
 #include "builder_adaptor.h"
-#import "expression.h"
+#include "expression.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/IR/Argument.h"
@@ -15,6 +15,11 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
 #include "scope.h"
+#include "expression_value.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/Function.h"
+#include "ast/module_node.h"
 
 // TODO: THis should be an array of nodes for a "body_expressions"
 FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body) :
@@ -42,7 +47,7 @@ std::unique_ptr<llvm::Function> FunctionNode::BuildIR(std::unique_ptr<Scope> con
 
   llvm::BasicBlock *block = llvm::BasicBlock::Create(*adaptor->Context(), "entry", function);
   adaptor->Builder()->SetInsertPoint(block);
-  adaptor->Builder()->CreateRet(body_->BuildIR(scope, adaptor).get());
+  adaptor->Builder()->CreateRet(body_->BuildIR(scope, adaptor).get()->value().get());
   verifyFunction(*function);
   scope->named_functions[signature_->name] = std::unique_ptr<llvm::Function>(function);
 
