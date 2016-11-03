@@ -4,14 +4,11 @@
 #include <string>
 #include <vector>
 
-namespace llvm {
-class Module;
-}
-
 class BuilderAdaptor;
 struct Scope;
 class Node;
 class Expression;
+class ExpressionValue;
 
 class ModuleNode {
 private:
@@ -22,7 +19,7 @@ public:
   ModuleNode(const std::string name);
 
   void append(Expression *expression);
-  std::unique_ptr<llvm::Module> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
+  std::unique_ptr<ExpressionValue> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
 };
 
 #endif
