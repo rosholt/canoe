@@ -4,13 +4,10 @@
 #include <string>
 #include <vector>
 
-namespace llvm {
-class Function;
-}
-
 class Node;
 class BuilderAdaptor;
 class Expression;
+class ExpressionValue;
 struct Scope;
 
 struct FunctionSignature {
@@ -25,7 +22,7 @@ private:
 
 public:
   FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body);
-  std::unique_ptr<llvm::Function> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
+  std::unique_ptr<ExpressionValue> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const;
 };
 
 #endif

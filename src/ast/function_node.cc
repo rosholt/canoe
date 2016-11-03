@@ -24,9 +24,11 @@
 // TODO: THis should be an array of nodes for a "body_expressions"
 FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body) :
     signature_(std::move(signature)), body_(std::move(body)) {
+  std::cout << "Creating function " << signature_->name << std::endl;
+  fflush(stdout);
 }
 
-std::unique_ptr<llvm::Function> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
+std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
   std::cout << "[Function " << signature_->name << "] Generating IR" << std::endl;
   fflush(stdout);
 
@@ -51,6 +53,6 @@ std::unique_ptr<llvm::Function> FunctionNode::BuildIR(std::unique_ptr<Scope> con
   verifyFunction(*function);
   scope->named_functions[signature_->name] = std::unique_ptr<llvm::Function>(function);
 
-//  return function;
-  return nullptr;
+  return std::make_unique<ExpressionValue>(std::unique_ptr<llvm::Function>(function));
+//  return nullptr;
 }

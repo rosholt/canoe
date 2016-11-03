@@ -12,6 +12,8 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
 
+#include <typeinfo>
+
 ModuleNode::ModuleNode(const std::string name) :
     name_(name), expressions_(std::vector<Expression *>()) {
 }
@@ -27,7 +29,8 @@ std::unique_ptr<ExpressionValue> ModuleNode::BuildIR(std::unique_ptr<Scope> cons
   auto module_scope = std::make_unique<Scope>();
   module_scope->module = std::make_unique<llvm::Module>(name_, *adaptor->Context());
 
-  std::for_each(expressions_.begin(), expressions_.end(), [&](auto e) {e->BuildIR(module_scope, adaptor);});
+  std::for_each(expressions_.begin(), expressions_.end(),
+      [&](auto e) {std::cout << "Build " << e << std::endl; fflush(stdout); e->BuildIR(module_scope, adaptor);});
 
   return std::make_unique<ExpressionValue>(std::move(module_scope->module));
 };

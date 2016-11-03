@@ -22,6 +22,7 @@
 #include "scope.h"
 #include "builder_adaptor.h"
 #include "expression.h"
+#include "expression_value.h"
 
 using namespace std;
 
