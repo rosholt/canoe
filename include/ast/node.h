@@ -3,17 +3,15 @@
 
 #include <memory>
 
-namespace llvm {
-	class Value;
-}
-
 class BuilderAdaptor;
+class ExpressionValue;
 struct Scope;
 
 class Node {
 public:
-  virtual std::unique_ptr<llvm::Value> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const = 0;
-  virtual ~Node() {}
+  virtual std::unique_ptr<ExpressionValue> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const = 0;
+  virtual ~Node() {
+  }
 };
 
 #endif
