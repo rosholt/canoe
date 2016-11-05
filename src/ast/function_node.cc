@@ -52,11 +52,13 @@ std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> co
   adaptor->Builder()->SetInsertPoint(block);
   std::cout << 1 << std::endl;
   fflush(stdout);
-  auto ret = body_->BuildIR(scope, adaptor);
+  auto ret = body_->BuildIR(scope, adaptor)->value();
   std::cout << 2 << std::endl;
   fflush(stdout);
-  adaptor->Builder()->CreateRet(ret.get()->value().get());
-  std::cout << 3 << std::endl;
+  std::cout << 3 << ret << std::endl;
+  fflush(stdout);
+  adaptor->Builder()->CreateRet(ret);
+  std::cout << 4 << std::endl;
   fflush(stdout);
   std::cout << "[Function " << signature_->name << "] Verifying" << std::endl;
   fflush(stdout);

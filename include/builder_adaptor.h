@@ -2,6 +2,8 @@
 #define CANOE_BUILDER_ADAPTOR_H_
 
 #include <memory>
+
+// TODO: This should be forward declared, with the weird templating
 #include "llvm/IR/IRBuilder.h"
 
 namespace llvm {

@@ -33,6 +33,6 @@ void ExpressionValue::dump() {
   }
 }
 
-std::unique_ptr<llvm::Value> ExpressionValue::value() {
-  return std::move(expression_value_result_.value);
+llvm::Value *ExpressionValue::value() {
+  return expression_value_result_.value.get();
 }

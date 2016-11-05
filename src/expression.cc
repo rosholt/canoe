@@ -34,7 +34,6 @@ std::unique_ptr<ExpressionValue> Expression::BuildIR(std::unique_ptr<Scope> cons
     val = expression_node.value_node->BuildIR(scope, adaptor);
     std::cout << "Received result" << std::endl;
     fflush(stdout);
-    val->dump();
     return val;
   case ExpressionType::FunctionExpression:
     std::cout << "Expression resolves to function" << std::endl;

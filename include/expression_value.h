@@ -30,7 +30,7 @@ public:
   ExpressionValue(std::unique_ptr<llvm::Module> module);
 
   void dump();
-  std::unique_ptr<llvm::Value> value();
+  llvm::Value *value();
 };
 
 #endif
