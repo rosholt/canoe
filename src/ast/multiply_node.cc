@@ -21,7 +21,7 @@ std::unique_ptr<ExpressionValue> MultiplyNode::BuildIR(std::unique_ptr<Scope> co
   auto leftValue = left_->BuildIR(scope, adaptor)->value();
   auto rightValue = right_->BuildIR(scope, adaptor)->value();
 
-  auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateMul(leftValue.get(), rightValue.get(), "multmp"));
+  auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateMul(leftValue, rightValue, "multmp"));
   std::cout << "[Multiply] IR Generation Complete" << std::endl;
   return std::make_unique<ExpressionValue>(std::move(value));
 }

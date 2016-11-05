@@ -20,7 +20,7 @@ std::unique_ptr<ExpressionValue> AddNode::BuildIR(std::unique_ptr<Scope> const &
   auto leftValue = left_->BuildIR(scope, adaptor)->value();
   auto rightValue = right_->BuildIR(scope, adaptor)->value();
 
-  auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateAdd(leftValue.get(), rightValue.get(), "addtmp"));
+  auto value = std::unique_ptr<llvm::Value>(adaptor->Builder()->CreateAdd(leftValue, rightValue, "addtmp"));
   std::cout << "[Add] IR Generation Complete" << std::endl;
   return std::make_unique<ExpressionValue>(std::move(value));
 };

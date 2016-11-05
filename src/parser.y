@@ -25,7 +25,7 @@ int main() {
   Node*               node_ptr;
   FunctionNode*       func_ptr;
   FunctionSignature*  func_signature_ptr;
-  SizedNodeArray*     sized_array_ptr;
+  std::vector<std::unique_ptr<Expression>>*     expression_vector;
   ModuleNode*         module_node_ptr;
 }
 
@@ -35,7 +35,7 @@ int main() {
 %type <expression_ptr> expr
 %type <expression_ptr> function
 %type <func_signature_ptr> function_signature
-%type <sized_array_ptr> function_arguments 
+%type <expression_vector> function_arguments 
 %type <expression_ptr> function_call 
 %type <module_node_ptr> exprs 
 
@@ -71,10 +71,10 @@ function_signature: DEF FIELD_NAME { $$ = new FunctionSignature; $$->name = *$2;
                         $$->parameters = vector<std::string> { *$4 };
                       }
 
-function_call: FIELD_NAME LEFT_PARENTHESIS function_arguments RIGHT_PARENTHESIS { std::vector<Expression *> v(std::begin($3->array), std::end($3->array)); $$ = new Expression(std::make_unique<CallNode>(*$1, v)); }
+function_call: FIELD_NAME LEFT_PARENTHESIS function_arguments RIGHT_PARENTHESIS { $$ = new Expression(std::make_unique<CallNode>(*$1, std::move(*$3))); }
 
-function_arguments: expr function_arguments { $2->push($1); $$ = $2; }
-                    | expr { $$ = new SizedArray<Expression *>; $$->push($1); } 
+function_arguments: expr function_arguments { $2->push_back(std::unique_ptr<Expression>($1)); $$ = $2; }
+                    | expr { $$ = new std::vector<std::unique_ptr<Expression>>; $$->push_back(std::unique_ptr<Expression>($1)); } 
 
 
 %%

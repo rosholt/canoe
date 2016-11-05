@@ -3,7 +3,9 @@
 
 #include <memory>
 
-class FunctionNode;
+#include "ast/function_node.h"
+#include "ast/module_node.h"
+
 class Node;
 class ModuleNode;
 struct Scope;
