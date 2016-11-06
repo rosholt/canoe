@@ -5,10 +5,10 @@
 
 class ConstantNode : public Node {
 private:
-  int value_;
+  const int value_;
 
 public:
-  ConstantNode(int value);
+  ConstantNode(const int value);
   std::unique_ptr<ExpressionValue> BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const override;
 };
 

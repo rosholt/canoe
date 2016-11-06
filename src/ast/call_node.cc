@@ -9,7 +9,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Function.h"
 
-CallNode::CallNode(std::string function_name, std::vector<std::unique_ptr<Expression>> &arguments) :
+CallNode::CallNode(std::string function_name, std::vector<std::unique_ptr<Expression>> arguments) :
     function_name_(function_name), arguments_(std::move(arguments)) {
 }
 

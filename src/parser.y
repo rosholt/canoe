@@ -64,12 +64,8 @@ expr: function
 
 function: function_signature TERMINATOR expr TERMINATOR END { $$ = new Expression(std::make_unique<FunctionNode>(std::unique_ptr<FunctionSignature>($1), std::unique_ptr<Expression>($3))); }
 
-function_signature: DEF FIELD_NAME { $$ = new FunctionSignature; $$->name = *$2; }
-                    | DEF FIELD_NAME LEFT_PARENTHESIS FIELD_NAME RIGHT_PARENTHESIS {
-                        $$ = new FunctionSignature;
-                        $$->name = *$2;
-                        $$->parameters = vector<std::string> { *$4 };
-                      }
+function_signature: DEF FIELD_NAME { $$ = new FunctionSignature(*$2); }
+                    | DEF FIELD_NAME LEFT_PARENTHESIS FIELD_NAME RIGHT_PARENTHESIS { $$ = new FunctionSignature(*$2, vector<std::string> { *$4 }) };
 
 function_call: FIELD_NAME LEFT_PARENTHESIS function_arguments RIGHT_PARENTHESIS { $$ = new Expression(std::make_unique<CallNode>(*$1, std::move(*$3))); }
 

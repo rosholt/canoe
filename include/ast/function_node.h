@@ -11,8 +11,11 @@ class ExpressionValue;
 struct Scope;
 
 struct FunctionSignature {
-  std::string name;
-  std::vector<std::string> parameters;
+  const std::string name_;
+  const std::vector<std::string> parameters_;
+
+  FunctionSignature(std::string name);
+  FunctionSignature(std::string name, std::vector<std::string> parameters);
 };
 
 class FunctionNode {

@@ -22,28 +22,36 @@
 #include "llvm/IR/Function.h"
 #include "ast/module_node.h"
 
+FunctionSignature::FunctionSignature(std::string name) :
+    name_(name) {
+}
+
+FunctionSignature::FunctionSignature(std::string name, std::vector<std::string> parameters) :
+    name_(name), parameters_(std::move(parameters)) {
+}
+
 // TODO: THis should be an array of nodes for a "body_expressions"
 FunctionNode::FunctionNode(std::unique_ptr<FunctionSignature> signature, std::unique_ptr<Expression> body) :
     signature_(std::move(signature)), body_(std::move(body)) {
-  std::cout << "Creating function " << signature_->name << std::endl;
+  std::cout << "Creating function " << signature_->name_ << std::endl;
   fflush(stdout);
 }
 
 std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> const &scope, std::unique_ptr<BuilderAdaptor> const &adaptor) const {
-  std::cout << "[Function " << scope->module->getModuleIdentifier() << "." << signature_->name << "] Generating IR" << std::endl;
+  std::cout << "[Function " << scope->module->getModuleIdentifier() << "." << signature_->name_ << "] Generating IR" << std::endl;
   fflush(stdout);
 
   auto integer_type = adaptor->Builder()->getInt32Ty();
 
   std::vector<llvm::Type *> params;
-  std::transform(signature_->parameters.begin(), signature_->parameters.end(), params.begin(), [&](auto p) {return integer_type;});
+  std::transform(signature_->parameters_.begin(), signature_->parameters_.end(), params.begin(), [&](auto p) {return integer_type;});
   auto function_type = llvm::FunctionType::get(integer_type, params, false);
 
-  llvm::Function *function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, signature_->name, scope->module.get());
+  llvm::Function *function = llvm::Function::Create(function_type, llvm::Function::ExternalLinkage, signature_->name_, scope->module.get());
 
   int parameter_index = 0;
   for (auto &arg : function->args()) {
-    auto parameter_name = signature_->parameters[parameter_index++];
+    auto parameter_name = signature_->parameters_[parameter_index++];
     arg.setName(parameter_name);
     scope->named_values[parameter_name] = std::unique_ptr<llvm::Argument>(&arg);
   }
@@ -60,14 +68,14 @@ std::unique_ptr<ExpressionValue> FunctionNode::BuildIR(std::unique_ptr<Scope> co
   adaptor->Builder()->CreateRet(ret);
   std::cout << 4 << std::endl;
   fflush(stdout);
-  std::cout << "[Function " << signature_->name << "] Verifying" << std::endl;
+  std::cout << "[Function " << signature_->name_ << "] Verifying" << std::endl;
   fflush(stdout);
   verifyFunction(*function);
-  std::cout << "[Function " << signature_->name << "] Verification Complete" << std::endl;
+  std::cout << "[Function " << signature_->name_ << "] Verification Complete" << std::endl;
   fflush(stdout);
-  scope->named_functions[signature_->name] = std::unique_ptr<llvm::Function>(function);
+  scope->named_functions[signature_->name_] = std::unique_ptr<llvm::Function>(function);
 
-  std::cout << "[Function " << signature_->name << "] IR Generation Complete" << std::endl;
+  std::cout << "[Function " << signature_->name_ << "] IR Generation Complete" << std::endl;
   return std::make_unique<ExpressionValue>(std::unique_ptr<llvm::Function>(function));
 //  return nullptr;
 }
